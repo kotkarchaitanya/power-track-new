@@ -1,0 +1,261 @@
+{
+  "adminRequests": [
+    {
+      "actionToken": "tok-1792479556426-qfpnvciqw",
+      "designation": "STUDENT",
+      "email": "vedant.kasar241@vit.edu",
+      "id": "req-1792479556426-tjxowb",
+      "name": "VEDANT KASAR",
+      "password": "Admin123",
+      "requestedAt": "2026-10-20T06:59:16.426Z",
+      "reviewedAt": "2026-10-20T06:59:59.564Z",
+      "reviewer": "kotkarchaitanya18@gmail.com",
+      "status": "approved"
+    }
+  ],
+  "adminSettings": {
+    "defaultVillageName": "Wadgaon Village & Rural Electric Sub-Division",
+    "googleMapsApiKey": "",
+    "mapProvider": "leaflet"
+  },
+  "affectedArea": {
+    "expectedRestoration": "12:30 PM",
+    "latitude": 18.5204,
+    "longitude": 73.8567,
+    "name": "Wadgaon Central, Market Yard & Substation Feeder 02",
+    "radiusMeters": 1200,
+    "reason": "Normal grid operational state; scheduled feeder line maintenance at 10:00 PM",
+    "status": "Electricity Available",
+    "village": "Wadgaon Khurd & Rural Sub-division",
+    "zoom": 14
+  },
+  "authorizedAdmins": [
+    "kotkarchaitanya18@gmail.com",
+    {
+      "approvedAt": "2026-10-20T06:59:59.564Z",
+      "designation": "STUDENT",
+      "email": "vedant.kasar241@vit.edu",
+      "name": "VEDANT KASAR"
+    }
+  ],
+  "history": [
+    {
+      "area": "Wadgaon North Feeder & Market Area",
+      "date": "2026-10-04",
+      "duration": "2h 12m",
+      "endTime": "05:12 PM",
+      "id": "hist-1",
+      "startTime": "03:00 PM",
+      "type": "Scheduled Load Shedding"
+    },
+    {
+      "area": "Shivaji Nagar & School Colony",
+      "date": "2026-10-03",
+      "duration": "2h 15m",
+      "endTime": "01:35 PM",
+      "id": "hist-2",
+      "startTime": "11:20 AM",
+      "type": "Unplanned Power Cut"
+    },
+    {
+      "area": "Substation 03 Transformer Bay",
+      "date": "2026-10-01",
+      "duration": "4h 15m",
+      "endTime": "12:15 PM",
+      "id": "hist-3",
+      "startTime": "08:00 AM",
+      "type": "Maintenance"
+    },
+    {
+      "area": "East Village Agriculture Feeder",
+      "date": "2026-09-28",
+      "duration": "1h 30m",
+      "endTime": "07:45 PM",
+      "id": "hist-4",
+      "startTime": "06:15 PM",
+      "type": "Emergency Outage"
+    },
+    {
+      "area": "All Village Sectors",
+      "date": "2026-09-25",
+      "duration": "2h 00m",
+      "endTime": "04:00 PM",
+      "id": "hist-5",
+      "startTime": "02:00 PM",
+      "type": "Scheduled Load Shedding"
+    },
+    {
+      "area": "Market Yard & Gram Panchayat Office",
+      "date": "2026-09-22",
+      "duration": "1h 45m",
+      "endTime": "11:15 AM",
+      "id": "hist-6",
+      "startTime": "09:30 AM",
+      "type": "Scheduled Load Shedding"
+    }
+  ],
+  "importantNotes": [
+    "Scheduled load shedding timings may change without prior notice due to state grid frequency variations or emergency load dispatch instructions.",
+    "Restoration times provided are estimated targets; actual restoration may vary by 15 to 30 minutes depending on field safety clearance.",
+    "During power cuts, please switch off high-surge electrical appliances (motor pumps, ACs, refrigerators) to prevent voltage surge damage upon restoration.",
+    "Always assume downed electrical wires are live. Do not approach fallen cables and report immediately to 1800-233-3435.",
+    "PowerTrack is updated continuously by substation electrical engineers. Bookmark this page for daily schedules."
+  ],
+  "notices": [
+    {
+      "date": "2026-10-05",
+      "description": "Electricity supply may experience brief technical fluctuations or temporary unavailability between 10:00 PM and 11:00 PM tonight due to critical 33/11kV transformer maintenance work.",
+      "id": "not-1",
+      "priority": "High",
+      "time": "02:00 PM",
+      "title": "Emergency Substation Transformer Overhaul"
+    },
+    {
+      "date": "2026-10-04",
+      "description": "Preventive vegetation clearance near high tension wires will be carried out across Wadgaon rural stretch. Please stay clear of ground operations.",
+      "id": "not-2",
+      "priority": "Medium",
+      "time": "10:30 AM",
+      "title": "Monsoon Tree Trimming Along 11kV Feeder Line"
+    },
+    {
+      "date": "2026-10-03",
+      "description": "Agricultural 3-phase power supply timetable for the week of October 5 to October 12 will provide 8 hours daily rotation (Shift A: Day, Shift B: Night).",
+      "id": "not-3",
+      "priority": "Normal",
+      "time": "09:00 AM",
+      "title": "Agricultural Pump Feeder Operating Hours Revised"
+    },
+    {
+      "date": "2026-10-01",
+      "description": "For broken wires, spark reports, or local fuse failures, call the village round-the-clock emergency line at 1800-233-3435 or contact local wireman.",
+      "id": "not-4",
+      "priority": "Normal",
+      "time": "08:00 AM",
+      "title": "24/7 Village Electricity Complaint Helpline Active"
+    }
+  ],
+  "schedules": [
+    {
+      "date": "2026-10-05",
+      "description": "Morning Uninterrupted Power Supply",
+      "duration": "3 Hours",
+      "endTime": "09:00 AM",
+      "expectedRestoration": "09:00 AM",
+      "id": "sch-1",
+      "startTime": "06:00 AM",
+      "status": "Available"
+    },
+    {
+      "date": "2026-10-05",
+      "description": "Scheduled Morning Load Shedding (Substation 02)",
+      "duration": "2 Hours",
+      "endTime": "11:00 AM",
+      "expectedRestoration": "11:00 AM",
+      "id": "sch-2",
+      "startTime": "09:00 AM",
+      "status": "Unavailable"
+    },
+    {
+      "date": "2026-10-05",
+      "description": "Daytime Grid Power Available for Commercial & Domestic",
+      "duration": "4 Hours",
+      "endTime": "03:00 PM",
+      "expectedRestoration": "03:00 PM",
+      "id": "sch-3",
+      "startTime": "11:00 AM",
+      "status": "Available"
+    },
+    {
+      "date": "2026-10-05",
+      "description": "Scheduled Afternoon Load Shedding",
+      "duration": "2 Hours",
+      "endTime": "05:00 PM",
+      "expectedRestoration": "05:00 PM",
+      "id": "sch-4",
+      "startTime": "03:00 PM",
+      "status": "Unavailable"
+    },
+    {
+      "date": "2026-10-05",
+      "description": "Evening Peak Supply Available",
+      "duration": "5 Hours",
+      "endTime": "10:00 PM",
+      "expectedRestoration": "10:00 PM",
+      "id": "sch-5",
+      "startTime": "05:00 PM",
+      "status": "Available"
+    },
+    {
+      "date": "2026-10-05",
+      "description": "Night Line Inspection & Scheduled Switchover",
+      "duration": "1 Hour",
+      "endTime": "11:00 PM",
+      "expectedRestoration": "11:00 PM",
+      "id": "sch-6",
+      "startTime": "10:00 PM",
+      "status": "Unavailable"
+    },
+    {
+      "date": "2026-10-05",
+      "description": "Night Uninterrupted Domestic Supply",
+      "duration": "7 Hours",
+      "endTime": "06:00 AM",
+      "expectedRestoration": "06:00 AM",
+      "id": "sch-7",
+      "startTime": "11:00 PM",
+      "status": "Available"
+    },
+    {
+      "date": "2026-10-06",
+      "description": "Morning Agriculture & Domestic Supply",
+      "duration": "3.5 Hours",
+      "endTime": "09:30 AM",
+      "expectedRestoration": "09:30 AM",
+      "id": "sch-8",
+      "startTime": "06:00 AM",
+      "status": "Available"
+    },
+    {
+      "date": "2026-10-06",
+      "description": "Scheduled Load Shedding (Zone B)",
+      "duration": "2 Hours",
+      "endTime": "11:30 AM",
+      "expectedRestoration": "11:30 AM",
+      "id": "sch-9",
+      "startTime": "09:30 AM",
+      "status": "Unavailable"
+    },
+    {
+      "date": "2026-10-06",
+      "description": "Afternoon Industrial & Domestic Supply",
+      "duration": "4.5 Hours",
+      "endTime": "04:00 PM",
+      "expectedRestoration": "04:00 PM",
+      "id": "sch-10",
+      "startTime": "11:30 AM",
+      "status": "Available"
+    }
+  ],
+  "systemStatus": {
+    "description": "Field crews concluding work; supply energizing soon.",
+    "isUnplanned": false,
+    "lastUpdated": "2026-10-20T07:06:49.615Z",
+    "nextCutDuration": "1 Hour",
+    "nextCutRestoration": "11:00 PM",
+    "nextCutTime": "10:00 PM",
+    "nextRestorationTime": "11:00 PM",
+    "status": "Restoration in Progress",
+    "statusText": "RESTORATION IN PROGRESS",
+    "targetRestorationCountdown": "2026-10-05T23:00:00"
+  },
+  "unplannedOutage": {
+    "active": false,
+    "additionalInfo": "Technical emergency crew deployed on site with replacement conductor cables.",
+    "affectedArea": "Wadgaon North Feeder & Industrial Zone",
+    "expectedRestoration": "06:30 PM",
+    "reason": "11kV Feeder Cable Breakdown near North Substation",
+    "startTime": "04:15 PM",
+    "targetTimestamp": "2026-10-05T18:30:00"
+  }
+}

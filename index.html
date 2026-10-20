@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PowerTrack - Real-Time Electricity & Load-Shedding Information</title>
+  <meta name="description" content="PowerTrack provides real-time information about electricity availability, scheduled load-shedding timetables, unplanned power cuts, and restoration updates for local communities and villages.">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Leaflet CSS for Interactive Village Affected Area Maps -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+
+  <!-- PowerTrack Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ========================================================================
+       1. FIRST PAGE – ROLE SELECTION (LANDING VIEW)
+       ======================================================================== -->
+  <section id="landing-view" class="view-section active">
+    <div class="landing-container">
+      <div class="brand-badge">⚡ Official Village & Local Power Portal</div>
+      
+      <div class="brand-hero">
+        <div class="brand-logo-large">
+          <svg viewBox="0 0 24 24">
+            <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z"/>
+          </svg>
+        </div>
+        <h1 class="landing-title">POWERTRACK</h1>
+        <p class="landing-tagline">"Track Power. Stay Informed."</p>
+        <p class="landing-desc">
+          Get electricity schedules, power-cut alerts and restoration updates.
+        </p>
+      </div>
+
+      <!-- Role Selection Cards -->
+      <div class="role-cards-grid">
+        <!-- 1. USER CARD -->
+        <div class="role-card role-user" id="btn-role-user">
+          <div class="role-icon-wrapper">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </div>
+          <div class="role-badge">Public Citizen Access</div>
+          <h3>USER</h3>
+          <p>View electricity availability, schedules, history and notices.</p>
+          <div class="role-btn">
+            <span>Continue as User</span>
+            <span>➔</span>
+          </div>
+        </div>
+
+        <!-- 2. ADMIN CARD -->
+        <div class="role-card role-admin" id="btn-role-admin">
+          <div class="role-icon-wrapper">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+          </div>
+          <div class="role-badge">Electrical Department & Wireman</div>
+          <h3>ADMIN</h3>
+          <p>Manage electricity schedules, power cuts, affected areas and notices.</p>
+          <div class="role-btn">
+            <span>Admin Login</span>
+            <span>➔</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       2. USER SECTION (FULL APPLICATION VIEW)
+       ======================================================================== -->
+  <div id="user-view" class="view-section">
+    <!-- Main User Navigation Bar -->
+    <header class="main-header">
+      <div class="container header-inner">
+        <a href="javascript:void(0)" class="brand-link" onclick="PowerTrackApp.showUserSubpage('home')">
+          <div class="brand-icon-box">
+            <svg viewBox="0 0 24 24"><path d="M13 2L3 14H12L11 22L21 10H12L13 2Z"/></svg>
+          </div>
+          <div class="brand-name-group">
+            <span class="brand-title">POWERTRACK</span>
+            <span class="brand-tag-mini">Wadgaon Sub-Division</span>
+          </div>
+        </a>
+
+        <!-- Desktop Navigation Menu -->
+        <ul class="nav-menu">
+          <li><a href="home.html" class="nav-link user-nav-link active">🏠 Home</a></li>
+          <li><a href="schedule.html" class="nav-link user-nav-link">📅 Schedule</a></li>
+          <li><a href="history.html" class="nav-link user-nav-link">📜 History</a></li>
+          <li><a href="notices.html" class="nav-link user-nav-link">📢 Notices</a></li>
+        </ul>
+
+        <!-- Header Live Meta -->
+        <div class="header-meta">
+          <div class="firebase-sync-pill" id="user-cloud-badge" title="Live Firebase Cloud Sync Active">
+            <span class="firebase-sync-dot"></span>
+            <span>Cloud Sync</span>
+          </div>
+
+          <div class="status-pill status-available" id="header-status-pill">
+            <span class="status-indicator-dot"></span>
+            <span id="header-status-text">Electricity Available</span>
+          </div>
+
+          <div class="header-time-pill">
+            <span class="live-mini-clock" id="header-live-clock">--:--:--</span>
+            <span>Live Local Time</span>
+          </div>
+
+          <button class="btn-switch-role btn-back-landing" title="Switch Portal Role">
+            <span>🔄 Switch Role</span>
+          </button>
+
+          <button class="hamburger-btn" id="hamburger-btn" aria-label="Toggle navigation">
+            ☰
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Mobile Drawer Navigation -->
+    <div class="mobile-nav-drawer" id="mobile-nav-drawer">
+      <a href="javascript:void(0)" class="nav-link user-nav-link active" data-page="home">🏠 Home Overview</a>
+      <a href="javascript:void(0)" class="nav-link user-nav-link" data-page="schedule">📅 Electricity Schedule</a>
+      <a href="javascript:void(0)" class="nav-link user-nav-link" data-page="history">📜 Interruption History</a>
+      <a href="javascript:void(0)" class="nav-link user-nav-link" data-page="notices">📢 Official Notices</a>
+      <div style="margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border-subtle); display:flex; flex-direction:column; gap:0.6rem;">
+        <button class="btn-secondary btn-back-landing" style="width: 100%;">← Return to Landing Page</button>
+      </div>
+    </div>
+
+    <!-- User Content Area -->
+    <main class="user-content-wrapper container">
+      
+      <!-- EMERGENCY UNPLANNED OUTAGE BANNER (Appears automatically when active) -->
+      <div class="unplanned-emergency-banner" id="emergency-banner">
+        <div class="emergency-icon-box">⚡</div>
+        <div class="emergency-info">
+          <div class="emergency-tag">🚨 Urgent Outage Alert</div>
+          <h2 class="emergency-title">UNPLANNED POWER CUT IN EFFECT</h2>
+          <p class="emergency-desc" id="emergency-reason">Transformer line failure under emergency restoration.</p>
+          <div class="emergency-meta-row">
+            <div class="emergency-meta-item"><strong>Affected Area:</strong> <span id="emergency-area">All Village Sectors</span></div>
+            <div class="emergency-meta-item"><strong>Started At:</strong> <span id="emergency-start-time">--:--</span></div>
+            <div class="emergency-meta-item"><strong>Expected Restoration:</strong> <span id="emergency-restoration">--:--</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====================================================================
+           2.1 USER HOME SUBPAGE
+           ==================================================================== -->
+      <section id="subpage-home" class="user-subpage active">
+        
+        <!-- A. CURRENT POWER STATUS HERO & G. LIVE CLOCK -->
+        <div class="hero-status-grid">
+          <!-- Current Power Status Card -->
+          <div class="status-hero-card">
+            <div class="card-header-label">
+              <span>⚡ Live Electricity Status</span>
+              <span id="hero-status-updated">Last updated: Just now</span>
+            </div>
+
+            <div class="status-main-display">
+              <div class="status-halo-icon available" id="hero-status-icon">
+                ⚡
+              </div>
+              <div>
+                <h2 class="status-headline" id="hero-status-headline">POWER AVAILABLE</h2>
+                <div style="display:flex; align-items:center; gap:0.5rem; margin-top:0.25rem;">
+                  <span class="status-indicator-dot" style="background:var(--status-available);"></span>
+                  <span style="font-size:0.9rem; font-weight:700; color:var(--status-available);">Feeder Grid Active</span>
+                </div>
+              </div>
+            </div>
+
+            <p class="status-desc-text" id="hero-status-desc">
+              Normal electricity supply is active across all village domestic and agricultural feeders. No planned load-shedding in progress.
+            </p>
+
+            <div class="hero-footer-meta">
+              <span>Status updates dynamically via Substation Command</span>
+              <span>24/7 Monitored</span>
+            </div>
+          </div>
+
+          <!-- Live Digital Clock Card -->
+          <div class="clock-card">
+            <div class="clock-top">
+              <span style="font-size:0.8rem; font-weight:700; text-transform:uppercase; color:var(--text-muted); letter-spacing:0.06em;">Digital System Clock</span>
+              <div class="live-indicator">
+                <span class="live-dot-ping"></span> Live
+              </div>
+            </div>
+
+            <div class="clock-digits-wrapper">
+              <div class="digital-time" id="digital-time">--:--:-- --</div>
+              <div class="digital-day" id="digital-day">Monday</div>
+              <div class="digital-date" id="digital-date">-- October 2026</div>
+            </div>
+
+            <div class="clock-footer">
+              Synchronized with State Grid Time Standards
+            </div>
+          </div>
+        </div>
+
+        <!-- C. NEXT POWER CUT & D. NEXT RESTORATION METRICS -->
+        <div class="metrics-row">
+          <!-- Next Power Cut Card -->
+          <div class="metric-card cut-metric">
+            <div class="metric-icon-box">⏳</div>
+            <div class="metric-content">
+              <div class="metric-label">Next Power Cut</div>
+              <div class="metric-value" id="next-cut-time">03:00 PM</div>
+              <div class="metric-sub" id="next-cut-duration">Expected Duration: 2 Hours</div>
+              <div class="metric-sub" id="next-cut-restoration">Restoration: 05:00 PM</div>
+            </div>
+          </div>
+
+          <!-- Next Restoration Card with Countdown -->
+          <div class="metric-card restore-metric">
+            <div class="metric-icon-box">⚡</div>
+            <div class="metric-content">
+              <div class="metric-label">Expected Restoration</div>
+              <div class="metric-value" id="next-restoration-time">05:00 PM</div>
+              <div class="metric-sub">Electricity expected in:</div>
+              <div class="countdown-box" id="restoration-countdown">01:24:35</div>
+            </div>
+          </div>
+
+          <!-- Affected Feeder Quick Metric -->
+          <div class="metric-card affected-metric">
+            <div class="metric-icon-box">📍</div>
+            <div class="metric-content">
+              <div class="metric-label">Primary Monitoring Feeder</div>
+              <div class="metric-value" style="font-size:1.15rem;">Substation 02 (11kV)</div>
+              <div class="metric-sub">Village Wadgaon Feeder Network</div>
+              <div class="metric-sub" style="color:var(--status-available);">Status: Normal Operations</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- B. TODAY'S COMPLETE TIMETABLE -->
+        <div class="section-block">
+          <div class="section-block-header">
+            <div class="section-block-title">
+              <h3>📋 Today's Complete Electricity Timetable</h3>
+              <span class="section-tag">Official Daily Schedule</span>
+            </div>
+            <span style="font-size:0.85rem; color:var(--text-secondary);">Directly synced with Substation Log</span>
+          </div>
+
+          <div class="table-responsive">
+            <table class="power-table">
+              <thead>
+                <tr>
+                  <th>Time Range</th>
+                  <th>Status</th>
+                  <th>Duration</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody id="today-timetable-body">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- E. AFFECTED AREA & GOOGLE MAPS INTEGRATION -->
+        <div class="section-block">
+          <div class="section-block-header">
+            <div class="section-block-title">
+              <h3>🗺️ Affected Area & Geographic Location Map</h3>
+              <span class="section-tag">Interactive Feeder Radar</span>
+            </div>
+            <div style="font-size:0.85rem; color:var(--text-secondary);">
+              Marker indicates currently active / monitored village sector
+            </div>
+          </div>
+
+          <div class="affected-area-grid">
+            <!-- Area Information Card -->
+            <div class="area-details-pane">
+              <div class="area-info-item">
+                <div class="info-label">Affected Area / Zone</div>
+                <div class="info-val" id="affected-area-name">Wadgaon Central & Feeder 02</div>
+                <div class="info-desc">Includes Market Yard, Gram Panchayat, and Residential Sectors 1-4</div>
+              </div>
+
+              <div class="area-info-item">
+                <div class="info-label">Current Electricity Supply Status</div>
+                <div class="info-val" id="affected-area-status" style="color:var(--status-available);">Electricity Available</div>
+              </div>
+
+              <div class="area-info-item">
+                <div class="info-label">Reason / Work Details</div>
+                <div class="info-desc" id="affected-area-reason" style="font-size:0.95rem; color:var(--text-main); font-weight:600;">
+                  Normal grid distribution; scheduled inspection at 10:00 PM.
+                </div>
+              </div>
+
+              <div class="area-info-item">
+                <div class="info-label">Expected Restoration Time</div>
+                <div class="info-val" id="affected-area-restoration">11:00 PM</div>
+              </div>
+            </div>
+
+            <!-- Map Container -->
+            <div class="map-outer-container">
+              <div id="affected-map"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- F. IMPORTANT NOTES SECTION -->
+        <div class="section-block">
+          <div class="section-block-header">
+            <div class="section-block-title">
+              <h3>📌 Important Public Notices & Safety Notes</h3>
+              <span class="section-tag">Advisory</span>
+            </div>
+            <span style="font-size:0.85rem; color:var(--text-muted);">Please read before power cuts</span>
+          </div>
+
+          <div class="notes-list" id="home-notes-list">
+            <!-- Dynamically populated notes -->
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ====================================================================
+           3. SCHEDULE SECTION (FULL CALENDAR & TIMETABLE)
+           ==================================================================== -->
+      <section id="subpage-schedule" class="user-subpage">
+        <div class="section-block">
+          <div class="section-block-header">
+            <div class="section-block-title">
+              <h3>📅 Comprehensive Electricity Schedule</h3>
+              <span class="section-tag">Date-Wise Timetable</span>
+            </div>
+            <p style="color:var(--text-secondary); font-size:0.92rem; width:100%;">
+              Select any date to view planned load-shedding slots, uninterrupted supply windows, and expected restoration times.
+            </p>
+          </div>
+
+          <!-- Schedule Toolbar -->
+          <div class="schedule-toolbar">
+            <div class="date-selector-group">
+              <label for="schedule-date-input" style="font-size:0.88rem; font-weight:700; color:var(--text-secondary);">Select Date:</label>
+              <input type="date" id="schedule-date-input" class="date-input">
+            </div>
+
+            <div style="display:flex; gap:0.5rem;">
+              <button class="btn-filter active" onclick="document.getElementById('schedule-date-input').value = new Date().toISOString().split('T')[0]; PowerTrackApp.showUserSubpage('schedule');">Today</button>
+              <button class="btn-filter" onclick="document.getElementById('schedule-date-input').value = new Date(Date.now() + 86400000).toISOString().split('T')[0]; PowerTrackApp.showUserSubpage('schedule');">Tomorrow</button>
+            </div>
+          </div>
+
+          <!-- Schedule Summary KPIs -->
+          <div class="schedule-kpi-row">
+            <div class="schedule-kpi">
+              <div class="kpi-label">Power Available Hours</div>
+              <div class="kpi-val" style="color:var(--status-available);" id="schedule-total-available">-- hrs</div>
+            </div>
+            <div class="schedule-kpi">
+              <div class="kpi-label">Load Shedding Hours</div>
+              <div class="kpi-val" style="color:var(--status-cut);" id="schedule-total-cuts">-- hrs</div>
+            </div>
+            <div class="schedule-kpi">
+              <div class="kpi-label">Total Time Slots</div>
+              <div class="kpi-val" id="schedule-slots-count">-- Slots</div>
+            </div>
+          </div>
+
+          <!-- Full Timetable -->
+          <div class="table-responsive">
+            <table class="power-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Time Range</th>
+                  <th>Status</th>
+                  <th>Duration</th>
+                  <th>Expected Restoration</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody id="full-schedule-table-body">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           4. HISTORY SECTION
+           ==================================================================== -->
+      <section id="subpage-history" class="user-subpage">
+        <div class="section-block">
+          <div class="section-block-header">
+            <div class="section-block-title">
+              <h3>📜 Electricity Interruption History Log</h3>
+              <span class="section-tag">Official Archive</span>
+            </div>
+            <p style="color:var(--text-secondary); font-size:0.92rem; width:100%;">
+              Records of past load-shedding events, emergency outages, maintenance disruptions, and restoration records.
+            </p>
+          </div>
+
+          <!-- History Filter Toolbar -->
+          <div class="history-filters">
+            <div class="search-box">
+              <span>🔍</span>
+              <input type="text" id="history-search-input" placeholder="Search by area, date or cause...">
+            </div>
+
+            <div style="display:flex; align-items:center; gap:0.5rem;">
+              <label for="history-type-filter" style="font-size:0.85rem; font-weight:600; color:var(--text-secondary);">Type:</label>
+              <select id="history-type-filter" class="form-input" style="padding:0.5rem 0.85rem; font-size:0.85rem;">
+                <option value="all">All Outage Types</option>
+                <option value="scheduled">Scheduled Load Shedding</option>
+                <option value="unplanned">Unplanned Power Cut</option>
+                <option value="maintenance">Maintenance</option>
+                <option value="emergency">Emergency Outage</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- History Table -->
+          <div class="table-responsive">
+            <table class="power-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Start Time</th>
+                  <th>End Time</th>
+                  <th>Duration</th>
+                  <th>Interruption Type</th>
+                  <th>Affected Area</th>
+                </tr>
+              </thead>
+              <tbody id="history-table-body">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           5. NOTICES SECTION
+           ==================================================================== -->
+      <section id="subpage-notices" class="user-subpage">
+        <div class="section-block">
+          <div class="section-block-header">
+            <div class="section-block-title">
+              <h3>📢 Official Electricity Bulletins & Notices</h3>
+              <span class="section-tag">Public Broadcast</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:0.75rem;">
+              <label for="notice-priority-filter" style="font-size:0.85rem; font-weight:600; color:var(--text-secondary);">Priority:</label>
+              <select id="notice-priority-filter" class="form-input" style="padding:0.45rem 0.85rem; font-size:0.85rem;">
+                <option value="all">All Priorities</option>
+                <option value="high">High Priority</option>
+                <option value="medium">Medium Priority</option>
+                <option value="normal">Normal Priority</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="notices-grid" id="notices-grid">
+            <!-- Dynamically populated notices -->
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Site Footer -->
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <div class="footer-brand">
+          <span style="color:var(--accent-cyan);">⚡</span> POWERTRACK - Village Electricity Information System
+        </div>
+        <div>
+          "Track Power. Stay Informed." &bull; Emergency Hotline: 1800-233-3435
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ========================================================================
+       6. ADMIN LOGIN PAGE
+       ======================================================================== -->
+  <section id="admin-login-view" class="view-section">
+    <div class="login-card">
+      <div class="login-icon-box">🔐</div>
+      <h2 class="login-title">Admin Login</h2>
+      <p class="login-subtitle">Sign in to manage electricity schedules, outage alerts, and notices.</p>
+
+      <!-- Google Sign In Button -->
+      <button type="button" id="btn-google-login" class="btn-google-signin">
+        <svg class="google-icon" viewBox="0 0 48 48">
+          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+        </svg>
+        <span>Sign in with Google</span>
+      </button>
+
+      <div class="login-divider">
+        <span>OR ENTER EMAIL &amp; PASSWORD</span>
+      </div>
+
+      <!-- Mode Toggle: Sign In vs Register -->
+      <div class="login-tab-bar">
+        <button type="button" class="login-tab-btn active" id="tab-btn-signin">Sign In</button>
+        <button type="button" class="login-tab-btn" id="tab-btn-register">Register Admin</button>
+      </div>
+
+      <form class="login-form" id="admin-login-form">
+        <div class="form-group" id="group-register-name" style="display:none;">
+          <label class="form-label" for="login-name">Applicant Full Name *</label>
+          <input type="text" id="login-name" class="form-input" placeholder="e.g. Ramesh Patil">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="login-username" id="login-email-label">Admin Email</label>
+          <input type="email" id="login-username" class="form-input" placeholder="e.g. admin@powertrack.org" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="login-password">Password</label>
+          <input type="password" id="login-password" class="form-input" placeholder="Enter password" required>
+        </div>
+
+        <div class="form-group" id="group-register-designation" style="display:none;">
+          <label class="form-label" for="login-designation">Department / Role</label>
+          <input type="text" id="login-designation" class="form-input" placeholder="e.g. Substation Junior Engineer">
+        </div>
+
+        <button type="submit" id="btn-login-submit" class="btn-primary" style="margin-top:0.5rem;">
+          <span id="login-submit-text">Secure Sign In</span>
+          <span>➔</span>
+        </button>
+      </form>
+
+      <div style="margin-top: 1.5rem;">
+        <button class="btn-secondary btn-back-landing" style="font-size:0.85rem; width:100%;">
+          ← Return to Landing Page
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       7. ADMIN DASHBOARD SECTION
+       ======================================================================== -->
+  <div id="admin-view" class="view-section">
+    <!-- Admin Top Bar -->
+    <header class="main-header" style="background:#0e1320;">
+      <div class="container header-inner">
+        <div style="display:flex; align-items:center; gap:1rem;">
+          <div class="brand-link">
+            <div class="brand-icon-box" style="background:rgba(59,130,246,0.2); border-color:#3b82f6;">
+              <svg viewBox="0 0 24 24"><path d="M13 2L3 14H12L11 22L21 10H12L13 2Z"/></svg>
+            </div>
+            <div class="brand-name-group">
+              <span class="brand-title">POWERTRACK ADMIN</span>
+              <span class="brand-tag-mini" style="color:#60a5fa;">Control Console</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Status Switcher in Admin Header -->
+        <div style="display:flex; align-items:center; gap:0.85rem;">
+          <div class="firebase-sync-pill" id="admin-cloud-badge" title="Firebase Realtime Database Connected">
+            <span class="firebase-sync-dot"></span>
+            <span>Cloud Live</span>
+          </div>
+
+          <div id="admin-user-profile" class="admin-user-profile" style="display:none;">
+            <img id="admin-user-avatar" class="admin-user-avatar" src="" alt="Admin Profile">
+            <div class="admin-user-info">
+              <span id="admin-user-name" class="admin-user-name">Admin</span>
+              <span id="admin-user-email" class="admin-user-email">admin@powertrack</span>
+            </div>
+          </div>
+
+          <div class="admin-quick-status">
+            <span style="font-size:0.75rem; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Quick Status:</span>
+            <select id="admin-quick-status-select">
+              <option value="Available">⚡ Power Available</option>
+              <option value="Unavailable">🔴 Power Cut / Outage</option>
+              <option value="Restoration in Progress">⏳ Restoration in Progress</option>
+            </select>
+          </div>
+
+          <button class="btn-danger btn-admin-logout" style="padding:0.45rem 0.9rem; font-size:0.85rem;">
+            <span>🚪 Logout</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Admin Body Layout -->
+    <div class="admin-layout">
+      <!-- Admin Sidebar Navigation -->
+      <aside class="admin-sidebar">
+        <ul class="admin-nav-list">
+          <li class="admin-nav-item active" data-tab="overview">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+            <span>Dashboard Overview</span>
+          </li>
+          <li class="admin-nav-item" data-tab="schedule">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            <span>Today's Schedule</span>
+          </li>
+          <li class="admin-nav-item" data-tab="unplanned">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            <span>Unplanned Power Cut</span>
+          </li>
+          <li class="admin-nav-item" data-tab="notices">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+            <span>Official Notices</span>
+          </li>
+          <li class="admin-nav-item" data-tab="affected-area">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            <span>Affected Area & Map</span>
+          </li>
+          <li class="admin-nav-item" data-tab="history">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+            <span>Outage History</span>
+          </li>
+          <li class="admin-nav-item" data-tab="notes">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+            <span>Important Notes</span>
+          </li>
+          <li class="admin-nav-item" data-tab="settings">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            <span>System Settings</span>
+          </li>
+          <li class="admin-nav-item" data-tab="approvals" id="nav-item-approvals" style="display:flex; align-items:center;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="m9 12 2 2 4-4"></path></svg>
+            <span>Admin Approvals</span>
+            <span class="badge-pending" id="badge-pending-count" style="display:none; margin-left:auto; background:#ef4444; color:#fff; font-size:0.72rem; font-weight:700; padding:0.15rem 0.5rem; border-radius:999px;">0</span>
+          </li>
+        </ul>
+
+        <div style="padding-top:1.5rem; border-top:1px solid var(--border-subtle);">
+          <button class="btn-secondary" style="width:100%; font-size:0.85rem;" onclick="PowerTrackApp.showView('user')">
+            👀 View Public User Site
+          </button>
+        </div>
+      </aside>
+
+      <!-- Admin Main Content Panel -->
+      <main class="admin-main-panel">
+        
+        <!-- 7.1 TAB: DASHBOARD OVERVIEW -->
+        <div id="admin-tab-overview" class="admin-tab-pane active">
+          <div class="admin-panel-header">
+            <div class="admin-panel-title">
+              <h2>Dashboard Overview</h2>
+              <p>System operational metrics, active power cuts, and quick timetable glance.</p>
+            </div>
+          </div>
+
+          <!-- KPI Grid -->
+          <div class="admin-kpi-grid">
+            <div class="admin-kpi-card">
+              <div class="kpi-label">Current Power Status</div>
+              <div class="kpi-num" id="admin-kpi-status" style="color:var(--status-available);">Available</div>
+              <div style="font-size:0.82rem; color:var(--text-secondary);">Real-time grid state</div>
+            </div>
+
+            <div class="admin-kpi-card">
+              <div class="kpi-label">Today's Load Shedding Slots</div>
+              <div class="kpi-num" id="admin-kpi-cuts">2</div>
+              <div style="font-size:0.82rem; color:var(--text-secondary);">Scheduled for today</div>
+            </div>
+
+            <div class="admin-kpi-card">
+              <div class="kpi-label">Next Target Restoration</div>
+              <div class="kpi-num" id="admin-kpi-restoration" style="font-size:1.45rem;">11:00 PM</div>
+              <div style="font-size:0.82rem; color:var(--text-secondary);">Expected grid recharge</div>
+            </div>
+
+            <div class="admin-kpi-card">
+              <div class="kpi-label">Active Notices</div>
+              <div class="kpi-num" id="admin-kpi-notices">4</div>
+              <div style="font-size:0.82rem; color:var(--text-secondary);">Published bulletins</div>
+            </div>
+          </div>
+
+          <!-- Quick Action Buttons -->
+          <div class="admin-card-box">
+            <h3 style="margin-bottom:1rem; font-size:1.2rem;">Quick Operations</h3>
+            <div class="action-btn-row">
+              <button class="btn-primary" onclick="PowerTrackApp.openAddScheduleModal()">➕ Add Schedule Slot</button>
+              <button class="btn-danger" onclick="PowerTrackApp.showAdminTab('unplanned')">🚨 Manage Unplanned Outage</button>
+              <button class="btn-secondary" onclick="PowerTrackApp.openAddNoticeModal()">📢 Post New Notice</button>
+              <button class="btn-secondary" onclick="PowerTrackApp.showAdminTab('affected-area')">🗺️ Update Affected Area Map</button>
+            </div>
+          </div>
+
+          <!-- Overview Timetable -->
+          <div class="admin-card-box">
+            <h3 style="margin-bottom:1rem; font-size:1.2rem;">Today's Registered Timetable Slots</h3>
+            <div class="table-responsive">
+              <table class="power-table">
+                <thead>
+                  <tr>
+                    <th>Time Range</th>
+                    <th>Status</th>
+                    <th>Duration</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-overview-timetable">
+                  <!-- Dynamically populated -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- 7.2 TAB: UPDATE TODAY'S SCHEDULE -->
+        <div id="admin-tab-schedule" class="admin-tab-pane">
+          <div class="admin-panel-header">
+            <div class="admin-panel-title">
+              <h2>Schedule Management</h2>
+              <p>Add, edit, or delete electricity schedule slots. Changes immediately reflect on citizen views.</p>
+            </div>
+            <button class="btn-primary" onclick="PowerTrackApp.openAddScheduleModal()">
+              ➕ Add New Slot
+            </button>
+          </div>
+
+          <div class="admin-card-box">
+            <div class="table-responsive">
+              <table class="power-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Time Range</th>
+                    <th>Status</th>
+                    <th>Duration</th>
+                    <th>Restoration Time</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-schedule-table-body">
+                  <!-- Dynamically populated -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- 7.3 TAB: UNPLANNED POWER CUT COMMAND CENTER -->
+        <div id="admin-tab-unplanned" class="admin-tab-pane">
+          <div class="admin-panel-header">
+            <div class="admin-panel-title">
+              <h2>Unplanned Power Cut Command Center</h2>
+              <p>Activate immediate emergency outages or mark power as restored with one click.</p>
+            </div>
+          </div>
+
+          <div class="unplanned-control-box">
+            <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; margin-bottom:1.5rem;">
+              <div>
+                <span class="unplanned-status-badge" id="unplanned-active-badge">● NO ACTIVE UNPLANNED OUTAGE</span>
+                <h3 style="font-size:1.4rem;">Emergency Outage Broadcast</h3>
+              </div>
+            </div>
+
+            <form id="unplanned-form" onsubmit="event.preventDefault();">
+              <div class="admin-grid-form">
+                <div class="form-group">
+                  <label class="form-label">Outage Start Time</label>
+                  <input type="text" id="unplanned-start-time" class="form-input" placeholder="e.g. 04:15 PM">
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Affected Area / Feeder</label>
+                  <input type="text" id="unplanned-area" class="form-input" placeholder="e.g. Wadgaon North Feeder & Industrial Zone">
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Expected Restoration Time</label>
+                  <input type="text" id="unplanned-restoration" class="form-input" placeholder="e.g. 06:30 PM">
+                </div>
+
+                <div class="form-group form-full-width">
+                  <label class="form-label">Reason for Emergency Outage</label>
+                  <input type="text" id="unplanned-reason" class="form-input" placeholder="e.g. 11kV Feeder Cable Breakdown near North Substation">
+                </div>
+
+                <div class="form-group form-full-width">
+                  <label class="form-label">Additional Crew & Repair Information</label>
+                  <textarea id="unplanned-info" class="form-input" rows="2" placeholder="e.g. Emergency repair crew deployed on site with conductor replacement kit."></textarea>
+                </div>
+              </div>
+
+              <!-- Dedicated Activation & Restoration Buttons -->
+              <div class="action-btn-row">
+                <button type="button" class="btn-danger" id="btn-activate-unplanned" style="padding:0.95rem 1.8rem; font-size:1rem;">
+                  🚨 Activate Emergency Power Cut
+                </button>
+                <button type="button" class="btn-success" id="btn-mark-restored" style="padding:0.95rem 1.8rem; font-size:1rem;">
+                  ✅ Mark as Restored (Power Available)
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- 7.4 TAB: ADD / MANAGE NOTICES -->
+        <div id="admin-tab-notices" class="admin-tab-pane">
+          <div class="admin-panel-header">
+            <div class="admin-panel-title">
+              <h2>Official Notices & Announcements</h2>
+              <p>Post and manage announcements with priority indicators (High, Medium, Normal).</p>
+            </div>
+            <button class="btn-primary" onclick="PowerTrackApp.openAddNoticeModal()">
+              📢 Post New Notice
+            </button>
+          </div>
+
+          <div class="admin-card-box">
+            <div class="table-responsive">
+              <table class="power-table">
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Priority</th>
+                    <th>Date & Time</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-notices-table-body">
+                  <!-- Dynamically populated -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- 7.5 TAB: UPDATE AFFECTED AREA -->
+        <div id="admin-tab-affected-area" class="admin-tab-pane">
+          <div class="admin-panel-header">
+            <div class="admin-panel-title">
+              <h2>Update Affected Area & Map Coordinates</h2>
+              <p>Modify the village affected area details and drag or click the map marker to set location coordinates.</p>
+            </div>
+          </div>
+
+          <div class="admin-card-box">
+            <form id="affected-area-form">
+              <div class="admin-grid-form">
+                <div class="form-group">
+                  <label class="form-label">Affected Area Name</label>
+                  <input type="text" id="admin-area-name" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Village / Sub-Division</label>
+                  <input type="text" id="admin-area-village" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Current Area Supply Status</label>
+                  <select id="admin-area-status" class="form-input">
+                    <option value="Electricity Available">Electricity Available</option>
+                    <option value="Electricity Unavailable">Electricity Unavailable</option>
+                    <option value="Restoration in Progress">Restoration in Progress</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Expected Restoration Time</label>
+                  <input type="text" id="admin-area-restoration" class="form-input">
+                </div>
+
+                <div class="form-group form-full-width">
+                  <label class="form-label">Reason / Work Description</label>
+                  <input type="text" id="admin-area-reason" class="form-input">
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Latitude</label>
+                  <input type="number" step="0.0001" id="admin-area-lat" class="form-input">
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Longitude</label>
+                  <input type="number" step="0.0001" id="admin-area-lng" class="form-input">
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Radius (Meters)</label>
+                  <input type="number" id="admin-area-radius" class="form-input" value="1000">
+                </div>
+              </div>
+
+              <!-- Interactive Location Picker Map in Admin -->
+              <div style="margin-bottom:1.5rem;">
+                <label class="form-label" style="margin-bottom:0.5rem; display:block;">Click or Drag marker to update location:</label>
+                <div class="map-outer-container" style="height:320px;">
+                  <div id="admin-location-map"></div>
+                </div>
+              </div>
+
+              <button type="submit" class="btn-success">
+                💾 Save Affected Area & Coordinates
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- 7.6 TAB: OUTAGE HISTORY -->
+        <div id="admin-tab-history" class="admin-tab-pane">
+          <div class="admin-panel-header">
+            <div class="admin-panel-title">
+              <h2>Interruption History Management</h2>
+              <p>Maintain historical records of power cuts, maintenance runs, and resolution durations.</p>
+            </div>
+            <button class="btn-primary" onclick="PowerTrackApp.openAddHistoryModal()">
+              ➕ Add History Record
+            </button>
+          </div>
+
+          <div class="admin-card-box">
+            <div class="table-responsive">
+              <table class="power-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Time Period</th>
+                    <th>Duration</th>
+                    <th>Type</th>
+                    <th>Area</th>
+                    <th>Delete</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-history-table-body">
+                  <!-- Dynamically populated -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- 7.7 TAB: IMPORTANT NOTES -->
+        <div id="admin-tab-notes" class="admin-tab-pane">
+          <div class="admin-panel-header">
+            <div class="admin-panel-title">
+              <h2>Important Notes & Citizen Guidelines</h2>
+              <p>Manage safety guidelines and general advice displayed on the citizen Home page.</p>
+            </div>
+            <button class="btn-primary" onclick="PowerTrackApp.addNotePrompt()">
+              ➕ Add Guideline Note
+            </button>
+          </div>
+
+          <div class="admin-card-box">
+            <div class="notes-list" id="admin-notes-list">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+
+        <!-- 7.8 TAB: SETTINGS -->
+        <div id="admin-tab-settings" class="admin-tab-pane">
+          <div class="admin-panel-header">
+            <div class="admin-panel-title">
+              <h2>System Settings & Google Maps Config</h2>
+              <p>Configure mapping provider, API keys, or reset sample data.</p>
+            </div>
+          </div>
+
+          <div class="admin-card-box">
+            <h3 style="margin-bottom:1rem; font-size:1.2rem;">Map Integration Options</h3>
+            <p style="color:var(--text-secondary); margin-bottom:1.5rem; font-size:0.92rem;">
+              PowerTrack is equipped with a high-performance Leaflet OpenStreetMap provider out of the box with zero external dependencies. You can also specify a Google Maps API Key here.
+            </p>
+
+            <div class="form-group" style="max-width:500px; margin-bottom:1.5rem;">
+              <label class="form-label">Google Maps JavaScript API Key (Optional)</label>
+              <input type="text" id="admin-google-maps-key" class="form-input" placeholder="AIzaSy...">
+              <small style="color:var(--text-muted); margin-top:0.35rem;">Leave blank to use native high-speed Leaflet radar maps.</small>
+            </div>
+
+            <button type="button" class="btn-primary" onclick="PowerTrackApp.showToast('Map settings saved', 'success')">
+              Save Settings
+            </button>
+          </div>
+
+          <div class="admin-card-box" style="border-color:rgba(255,51,102,0.3);">
+            <h3 style="margin-bottom:0.5rem; font-size:1.2rem; color:var(--status-cut);">Demo Data Reset</h3>
+            <p style="color:var(--text-secondary); margin-bottom:1.25rem; font-size:0.92rem;">
+              Restore all timetables, notices, affected areas, and history records back to initial village demonstration state.
+            </p>
+            <button class="btn-danger" onclick="PowerTrackApp.resetDemoData()">
+              🔄 Reset to Default Village Data
+            </button>
+          </div>
+        </div>
+
+        <!-- 7.9 TAB: ADMIN APPROVALS & REGISTRATION REQUESTS -->
+        <div id="admin-tab-approvals" class="admin-tab-pane">
+          <div class="admin-panel-header">
+            <div class="admin-panel-title">
+              <h2>🛡️ Administrator Approvals & Access Control</h2>
+              <p>Authorize or decline new administrator registration requests. Approved administrators receive full access.</p>
+            </div>
+            <div>
+              <button class="btn-secondary" onclick="PowerTrackApp.renderAdminApprovalsTab()" style="font-size:0.85rem;">
+                🔄 Refresh Requests
+              </button>
+            </div>
+          </div>
+
+          <!-- KPI Cards for Approvals -->
+          <div class="admin-kpi-grid" style="margin-bottom:1.5rem;">
+            <div class="admin-kpi-card">
+              <div class="kpi-label">Primary Super Admin</div>
+              <div class="kpi-num" style="font-size:1.1rem; color:var(--accent-cyan); word-break:break-all;">kotkarchaitanya18@gmail.com</div>
+              <div style="font-size:0.82rem; color:var(--text-secondary);">Permanent Root Authority</div>
+            </div>
+            <div class="admin-kpi-card">
+              <div class="kpi-label">Pending Requests</div>
+              <div class="kpi-num" id="kpi-pending-reqs" style="color:#ef4444;">0</div>
+              <div style="font-size:0.82rem; color:var(--text-secondary);">Awaiting authorization</div>
+            </div>
+            <div class="admin-kpi-card">
+              <div class="kpi-label">Authorized Admins</div>
+              <div class="kpi-num" id="kpi-authorized-admins" style="color:var(--status-available);">1</div>
+              <div style="font-size:0.82rem; color:var(--text-secondary);">Active administrator accounts</div>
+            </div>
+          </div>
+
+          <!-- Pending Requests Table -->
+          <div class="admin-card-box">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem;">
+              <h3 style="margin:0; font-size:1.2rem; display:flex; align-items:center; gap:0.5rem;">
+                <span>⏳ Pending Registration Requests</span>
+                <span class="badge" id="badge-pending-table-count" style="background:#ef4444; color:#fff; font-size:0.75rem; padding:0.2rem 0.55rem; border-radius:999px;">0</span>
+              </h3>
+              <small style="color:var(--text-muted);">Decide to Accept &amp; Register or Decline each applicant</small>
+            </div>
+            
+            <div class="table-responsive">
+              <table class="power-table">
+                <thead>
+                  <tr>
+                    <th>Applicant</th>
+                    <th>Email Address</th>
+                    <th>Role / Dept</th>
+                    <th>Submitted At</th>
+                    <th>Decision / Action</th>
+                  </tr>
+                </thead>
+                <tbody id="table-pending-requests">
+                  <!-- Dynamically populated -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Authorized Administrators Table -->
+          <div class="admin-card-box">
+            <h3 style="margin-bottom:1rem; font-size:1.2rem;">✅ Authorized Administrators</h3>
+            <div class="table-responsive">
+              <table class="power-table">
+                <thead>
+                  <tr>
+                    <th>Admin Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Authorization State</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="table-authorized-admins">
+                  <!-- Dynamically populated -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- All Requests Log -->
+          <div class="admin-card-box">
+            <h3 style="margin-bottom:1rem; font-size:1.2rem;">📜 Request Audit History</h3>
+            <div class="table-responsive">
+              <table class="power-table">
+                <thead>
+                  <tr>
+                    <th>Applicant</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Requested At</th>
+                    <th>Reviewed At</th>
+                    <th>Reviewer</th>
+                  </tr>
+                </thead>
+                <tbody id="table-requests-history">
+                  <!-- Dynamically populated -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODALS FOR ADD / EDIT
+       ======================================================================== -->
+  
+  <!-- SCHEDULE MODAL -->
+  <div class="modal-overlay" id="schedule-modal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="modal-schedule-title">Schedule Slot</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <form id="form-modal-schedule">
+        <div class="modal-body">
+          <div class="admin-grid-form" style="margin-bottom:0;">
+            <div class="form-group">
+              <label class="form-label">Date</label>
+              <input type="date" id="modal-sch-date" class="form-input" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Status</label>
+              <select id="modal-sch-status" class="form-input">
+                <option value="Available">Available (Green)</option>
+                <option value="Unavailable">Unavailable (Red - Load Shedding)</option>
+                <option value="Restoration in Progress">Restoration in Progress (Orange)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Start Time</label>
+              <input type="text" id="modal-sch-start" class="form-input" placeholder="e.g. 09:00 AM" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">End Time</label>
+              <input type="text" id="modal-sch-end" class="form-input" placeholder="e.g. 11:00 AM" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Duration</label>
+              <input type="text" id="modal-sch-duration" class="form-input" placeholder="e.g. 2 Hours" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Expected Restoration Time</label>
+              <input type="text" id="modal-sch-restoration" class="form-input" placeholder="e.g. 11:00 AM">
+            </div>
+            <div class="form-group form-full-width">
+              <label class="form-label">Description</label>
+              <input type="text" id="modal-sch-desc" class="form-input" placeholder="e.g. Scheduled Morning Load Shedding" required>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary btn-modal-cancel">Cancel</button>
+          <button type="submit" class="btn-primary">Save Slot</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- NOTICE MODAL -->
+  <div class="modal-overlay" id="notice-modal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="modal-notice-title">Notice Announcement</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <form id="form-modal-notice">
+        <div class="modal-body">
+          <div class="admin-grid-form" style="margin-bottom:0;">
+            <div class="form-group form-full-width">
+              <label class="form-label">Notice Title</label>
+              <input type="text" id="modal-not-title" class="form-input" placeholder="e.g. Emergency Substation Line Maintenance" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Date</label>
+              <input type="date" id="modal-not-date" class="form-input" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Time</label>
+              <input type="text" id="modal-not-time" class="form-input" placeholder="e.g. 02:00 PM" required>
+            </div>
+            <div class="form-group form-full-width">
+              <label class="form-label">Priority Level</label>
+              <select id="modal-not-priority" class="form-input">
+                <option value="Normal">Normal (Green/Blue)</option>
+                <option value="Medium">Medium (Orange Warning)</option>
+                <option value="High">High (Red Critical)</option>
+              </select>
+            </div>
+            <div class="form-group form-full-width">
+              <label class="form-label">Detailed Description</label>
+              <textarea id="modal-not-desc" class="form-input" rows="3" placeholder="Provide complete notice details for citizens..." required></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary btn-modal-cancel">Cancel</button>
+          <button type="submit" class="btn-primary">Publish Notice</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- HISTORY MODAL -->
+  <div class="modal-overlay" id="history-modal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3>Add Outage History Record</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <form id="form-modal-history">
+        <div class="modal-body">
+          <div class="admin-grid-form" style="margin-bottom:0;">
+            <div class="form-group">
+              <label class="form-label">Date</label>
+              <input type="date" id="modal-hist-date" class="form-input" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Interruption Type</label>
+              <select id="modal-hist-type" class="form-input">
+                <option value="Scheduled Load Shedding">Scheduled Load Shedding</option>
+                <option value="Unplanned Power Cut">Unplanned Power Cut</option>
+                <option value="Maintenance">Maintenance</option>
+                <option value="Emergency Outage">Emergency Outage</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Start Time</label>
+              <input type="text" id="modal-hist-start" class="form-input" placeholder="e.g. 03:00 PM" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">End Time</label>
+              <input type="text" id="modal-hist-end" class="form-input" placeholder="e.g. 05:12 PM" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Duration</label>
+              <input type="text" id="modal-hist-duration" class="form-input" placeholder="e.g. 2h 12m" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Affected Area</label>
+              <input type="text" id="modal-hist-area" class="form-input" placeholder="e.g. Wadgaon North Feeder" required>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary btn-modal-cancel">Cancel</button>
+          <button type="submit" class="btn-primary">Add Record</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ADMIN REGISTRATION CONFIRMATION MODAL -->
+  <div class="modal-overlay" id="admin-reg-modal">
+    <div class="modal-dialog" style="max-width:560px;">
+      <div class="modal-header">
+        <h3 id="modal-admin-reg-title">⚡ Admin Registration Status</h3>
+        <button class="modal-close-btn" onclick="PowerTrackApp.closeAdminRegModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="modal-admin-reg-body" style="padding:1.5rem;">
+        <!-- Dynamically populated -->
+      </div>
+      <div class="modal-footer" id="modal-admin-reg-footer">
+        <button type="button" class="btn-primary" onclick="PowerTrackApp.closeAdminRegModal()">OK, Return to Login</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Leaflet Maps Script -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <!-- Firebase Compat SDKs (Zero-build standard vanilla JS) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+
+  <!-- PowerTrack Firebase Configuration -->
+  <script src="js/firebase-config.js"></script>
+
+  <!-- PowerTrack Client Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
